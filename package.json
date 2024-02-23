@@ -13,7 +13,6 @@
   "dependencies": {
     "@automerge/automerge-repo": "^1.1.1",
     "@automerge/automerge-repo-network-websocket": "^1.1.1",
-    "@living-papers/cli": "^0.1.7",
     "cors": "^2.8.5",
     "debug": "^4.3.4",
     "express": "^4.18.2",
