@@ -113,12 +113,14 @@ async function main() {
         (async () => {
           try {
             await exec(`docker kill ${dockerContainerName} && docker rm ${dockerContainerName}`);
+            debug("killed", dockerContainerName);
           } catch (e) {
             debug("error killing/removing worker:", e);
           }
         })();
       }
     }
+    debug("done checking for old workers");
   }, attentionSpanMs);  // TODO: slow it down
 }
 
