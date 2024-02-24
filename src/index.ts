@@ -70,7 +70,7 @@ async function main() {
         const sourceHandle = repo.find(sourceUrl as AutomergeUrl);
         const buildsHandle = repo.create<BuildsDoc>();
 
-        const dockerContainerName = `lpub-worker-${sourceHandle.documentId}`;
+        const dockerContainerName = `lp-worker-${sourceHandle.documentId}`;
         const buildsUrl = buildsHandle.url;
 
         subDebug("starting", dockerContainerName);
