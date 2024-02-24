@@ -3,6 +3,8 @@ import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network
 import cors from "cors";
 import debugLib from "debug";
 import express from "express";
+import https from "node:https";
+import fsP from "node:fs/promises";
 import * as child_process from "node:child_process";
 import * as util from "node:util";
 import { OneAtATime } from "./OneAtATime.js";
@@ -97,9 +99,15 @@ async function main() {
     }
   });
 
+  // TODO: make this all generic; make HTTP possible
+  const privateKey = await fsP.readFile('/etc/letsencrypt/live/lp.joshuahhh.com/privkey.pem');
+  const certificate = await fsP.readFile('/etc/letsencrypt/live/lp.joshuahhh.com/fullchain.pem');
   const PORT = 8088;
-  app.listen(PORT, () => {
-    console.log(`lp-server listening at http://localhost:${PORT}`)
+  https.createServer({
+    key: privateKey,
+    cert: certificate
+  }, app).listen(PORT, () => {
+    console.log(`lp-server listening at https://localhost:${PORT}`)
   });
 
   setInterval(() => {
