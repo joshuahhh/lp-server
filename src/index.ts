@@ -1,13 +1,12 @@
-import { AutomergeUrl, DocHandle, Repo } from "@automerge/automerge-repo";
+import { AutomergeUrl, Repo } from "@automerge/automerge-repo";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
+import cors from "cors";
+import debugLib from "debug";
+import express from "express";
 import * as child_process from "node:child_process";
 import * as util from "node:util";
-import * as fsP from "node:fs/promises";
-import { BuildOutput, BuildsDoc, Result, getLatestBuild, getLatestSuccessfulBuild, writeNewFile } from "./lp-shared.js";
-import express from "express";
-import cors from "cors";
-import debugLib, { Debugger } from "debug";
 import { OneAtATime } from "./OneAtATime.js";
+import { BuildsDoc } from "./lp-shared.js";
 
 
 const debug = debugLib("lp-server");
@@ -28,6 +27,14 @@ type WorkerInfo = {
 }
 
 async function main() {
+  try {
+    const execResult = await exec('./obliterate-docker-workers.sh');
+    execResult.stdout.length > 0 && debug(execResult.stdout);
+    execResult.stderr.length > 0 && debug(execResult.stderr);
+  } catch (e) {
+    debug("error running obliterate-docker-workers.sh:", e);
+  }
+
   const repo = new Repo({
     network: [
       new BrowserWebSocketClientAdapter("wss://sync.automerge.org"),
@@ -107,7 +114,7 @@ async function main() {
           try {
             await exec(`docker kill ${dockerContainerName} && docker rm ${dockerContainerName}`);
           } catch (e) {
-            debug("error killing docker:", e);
+            debug("error killing/removing worker:", e);
           }
         })();
       }

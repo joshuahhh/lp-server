@@ -5,8 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/index.ts",
-    "build": "tsc"
+    "start": "DEBUG=lp-server tsx src/index.ts"
   },
   "author": "",
   "license": "ISC",
