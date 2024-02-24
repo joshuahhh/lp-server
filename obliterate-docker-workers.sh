@@ -8,7 +8,7 @@ else
   docker kill $ids
 fi
 
-ids=$(docker ps -q -a--filter name=^lp-worker-.*$)
+ids=$(docker ps -q -a --filter name=^lp-worker-.*$)
 if [ -z "$ids" ]; then
   echo "No containers to remove"
 else
