@@ -102,6 +102,12 @@ async function main() {
   app.get("/", async (req, res) => {
     const dockerResult = await exec("docker container list");
 
+    const workerInfosHtml =
+      JSON.stringify(Array.from(workerInfos.values()), null, 2)
+        .replaceAll(/automerge:.{28}/g, (match) =>
+          `<a href="https://joshuahhh.com/amview/#/${match}">${match}</a>`
+        );
+
     res.contentType("text/html");
     res.send(`
       <!DOCTYPE html>
@@ -114,7 +120,7 @@ async function main() {
           probably running ok! on commit ${(await exec('git rev-parse HEAD')).stdout.trim().slice(0, 7)}
           <h2>workerInfos</h2>
           <div>  <!-- keep json chrome extension off our case -->
-            <pre>${JSON.stringify(Array.from(workerInfos.values()), null, 2)}</pre>
+            <pre>${workerInfosHtml}</pre>
           </div>
           <h2>"docker container list"</h2>
           <pre>${dockerResult.stdout}</pre>
