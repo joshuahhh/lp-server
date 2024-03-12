@@ -29,6 +29,15 @@ type WorkerInfo = {
 }
 
 async function main() {
+  // I've given up on Docker manifests for now
+  const arch =
+    process.arch === "arm64" ? "arm64" :
+    process.arch === "x64" ? "amd64" : undefined;
+  if (!arch) {
+    console.error("unsupported arch", process.arch);
+    process.exit(1);
+  }
+
   try {
     const execResult = await exec('./obliterate-docker-workers.sh');
     execResult.stdout.length > 0 && debug(execResult.stdout);
@@ -59,6 +68,8 @@ async function main() {
     const workerInfo = workerInfos.get(sourceUrl);
 
     if (workerInfo) {
+      // TODO: check if the worker is still running?
+      //   docker container inspect -f '{{.State.Status}}' <container_name> === "running"
       subDebug("worker exists");
       workerInfo.lastRequestTime = new Date();
       res.send(workerInfo.buildsUrl);
@@ -76,9 +87,9 @@ async function main() {
         const buildsUrl = buildsHandle.url;
 
         subDebug("starting", dockerContainerName);
-        const shCommand = `node lib/index.js ${sourceUrl} ${buildsUrl} 2>&1 > index.log`;
+        const shCommand = `node lib/index.js ${sourceUrl} ${buildsUrl} > index.log 2>&1`;
         await exec(
-          `docker run --name ${dockerContainerName} -d joshuahhh/lp-per-doc-server sh -c "${shCommand}"`
+          `docker run --name ${dockerContainerName} -d joshuahhh/lp-per-doc-server-${arch} sh -c "${shCommand}"`
         );
         subDebug("started", dockerContainerName);
 
@@ -130,16 +141,23 @@ async function main() {
     `);
   });
 
-  // TODO: make this all generic; make HTTP possible
-  const privateKey = await fsP.readFile('/etc/letsencrypt/live/lp.joshuahhh.com/privkey.pem');
-  const certificate = await fsP.readFile('/etc/letsencrypt/live/lp.joshuahhh.com/fullchain.pem');
   const PORT = 8088;
-  https.createServer({
-    key: privateKey,
-    cert: certificate
-  }, app).listen(PORT, () => {
-    console.log(`lp-server listening at https://localhost:${PORT}`)
-  });
+  if (process.env.NODE_ENV === "development") {
+    app.listen(PORT, () => {
+      console.log(`lp-server listening at http://localhost:${PORT}`)
+    });
+  } else {
+    // TODO: make this all generic; make HTTP possible
+    const privateKey = await fsP.readFile('/etc/letsencrypt/live/lp.joshuahhh.com/privkey.pem');
+    const certificate = await fsP.readFile('/etc/letsencrypt/live/lp.joshuahhh.com/fullchain.pem');
+    const PORT = 8088;
+    https.createServer({
+      key: privateKey,
+      cert: certificate
+    }, app).listen(PORT, () => {
+      console.log(`lp-server listening somewhere or other, on port ${PORT}`)
+    });
+  }
 
   setInterval(() => {
     debug("checking for old workers");
