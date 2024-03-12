@@ -107,7 +107,7 @@ async function main() {
       <h1>lp-server</h1>
       probably running ok!
       <h2>workerInfos</h2>
-      <pre>${JSON.stringify([...workerInfos], null, 2)}</pre>
+      <pre>${JSON.stringify(Array.from(workerInfos.values()), null, 2)}</pre>
       <h2>"docker container list"</h2>
       <pre>${dockerResult.stdout}</pre>
       <pre style="color: red">${dockerResult.stderr}</pre>
