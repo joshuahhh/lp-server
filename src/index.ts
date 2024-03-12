@@ -100,9 +100,17 @@ async function main() {
   });
 
   app.get("/", async (req, res) => {
+    const dockerResult = await exec("docker container list");
+
     res.contentType("text/html");
     res.send(`
       <h1>lp-server</h1>
+      probably running ok!
+      <h2>workerInfos</h2>
+      <pre>${JSON.stringify([...workerInfos], null, 2)}</pre>
+      <h2>"docker container list"</h2>
+      <pre>${dockerResult.stdout}</pre>
+      <pre style="color: red">${dockerResult.stderr}</pre>
     `);
   });
 
