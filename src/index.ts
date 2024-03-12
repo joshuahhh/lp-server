@@ -104,13 +104,21 @@ async function main() {
 
     res.contentType("text/html");
     res.send(`
-      <h1>lp-server</h1>
-      probably running ok! on commit ${(await exec('git rev-parse HEAD')).stdout.trim().slice(0, 7)}
-      <h2>workerInfos</h2>
-      <pre>${JSON.stringify(Array.from(workerInfos.values()), null, 2)}</pre>
-      <h2>"docker container list"</h2>
-      <pre>${dockerResult.stdout}</pre>
-      <pre style="color: red">${dockerResult.stderr}</pre>
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>lp-server</title>
+        </head>
+        <body>
+          <h1>lp-server</h1>
+          probably running ok! on commit ${(await exec('git rev-parse HEAD')).stdout.trim().slice(0, 7)}
+          <h2>workerInfos</h2>
+          <pre>${JSON.stringify(Array.from(workerInfos.values()), null, 2)}</pre>
+          <h2>"docker container list"</h2>
+          <pre>${dockerResult.stdout}</pre>
+          <pre style="color: red">${dockerResult.stderr}</pre>
+        </body>
+      </html>
     `);
   });
 
