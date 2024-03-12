@@ -99,6 +99,13 @@ async function main() {
     }
   });
 
+  app.get("/", async (req, res) => {
+    res.contentType("text/html");
+    res.send(`
+      <h1>lp-server</h1>
+    `);
+  });
+
   // TODO: make this all generic; make HTTP possible
   const privateKey = await fsP.readFile('/etc/letsencrypt/live/lp.joshuahhh.com/privkey.pem');
   const certificate = await fsP.readFile('/etc/letsencrypt/live/lp.joshuahhh.com/fullchain.pem');
